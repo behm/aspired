@@ -1,0 +1,2 @@
+/Aspired.AppHost/SqlServer/configure-db.sh text eol=lf
+/Aspired.AppHost/SqlServer/entrypoint.sh text eol=lf
