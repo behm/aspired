@@ -25,8 +25,7 @@ var sqlServer = builder
     .WithLifetime(ContainerLifetime.Persistent)
     .WithBindMount(sqlShell, target: "/usr/config")                     // NOTE: ensure all script line endings are LF for Linux container
     .WithBindMount(sqlScript, target: "/docker-entrypoint-initdb.d")    // NOTE: ensure all script line endings are LF for Linux container
-    //.WithEntrypoint("/usr/config/entrypoint.sh");
-    ;
+    .WithEntrypoint("/usr/config/entrypoint.sh");
     //.PublishAsConnectionString()  // if you want to just publish this as a connection string
     //.PublishAsAzureSqlDatabase()  // todo: come back to this
 
