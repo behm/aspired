@@ -64,4 +64,7 @@
     <Build Include="dbo\Product.sql" />
     <None Include="sql\Aspired.Database_Create.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="Aspired.Database.refactorlog" />
+  </ItemGroup>
 </Project>

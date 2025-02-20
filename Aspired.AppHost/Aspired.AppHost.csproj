@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Aspired.ApiService\Aspired.ApiService.csproj" />
+    <ProjectReference Include="..\Aspired.DatabaseMigrations\Aspired.DatabaseMigrations.csproj" />
     <ProjectReference Include="..\Aspired.Web\Aspired.Web.csproj" />
   </ItemGroup>
 
