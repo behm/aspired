@@ -32,7 +32,8 @@ var sqlDatabase = sqlServer.AddDatabase("aspired-db", "Aspired");
 var dbMigrator = builder.AddProject<Projects.Aspired_DatabaseMigrations>("db-migrator")
     .WithReference(sqlDatabase)
     .WithReference(sqlServer)
-    .WaitFor(sqlServer);
+    .WaitFor(sqlServer)
+    .WithExplicitStart();
 
 var apiService = builder.AddProject<Projects.Aspired_ApiService>("apiservice")
     .WithReference(sqlDatabase)

@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Microsoft.Data.SqlClient" Version="9.0.0" />
+    <PackageReference Include="Aspire.Microsoft.Data.SqlClient" Version="9.1.0" />
     <PackageReference Include="dbup-sqlserver" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.2" />
   </ItemGroup>
@@ -19,7 +19,7 @@
     </None>
   </ItemGroup>
 
-  <Target Name="PreBuild"  BeforeTargets="PreBuildEvent">
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="echo OS: $(OS)"></Exec>
     <Exec Command="echo OutDir: $(OutDir)"></Exec>
     <Exec Condition="'$(OS)' == 'Windows_NT'" Command="rmdir /s /q &quot;$(OutDir)\\Scripts&quot; &amp;&amp; mkdir &quot;$(OutDir)\\Scripts&quot;" />
