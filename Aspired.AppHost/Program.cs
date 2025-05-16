@@ -1,3 +1,5 @@
+using Aspired.AppHost.Commands;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var cache = builder.AddRedis("cache");
@@ -15,15 +17,20 @@ var cache = builder.AddRedis("cache");
 
 var sqlPassword = builder.AddParameter("sql-password");
 
+#pragma warning disable ASPIREPROXYENDPOINTS001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 var sqlServer = builder
     .AddSqlServer("aspired-sql", sqlPassword, 7890)
     .WithDataVolume("aspired-data")
+    .WithContainerName("aspired-sql")
     .WithLifetime(ContainerLifetime.Persistent)
-//    .WithBindMount("./SqlServerConfig", target: "/usr/config")                          // NOTE: ensure all script are UTF-8 with LF line endings for Linux container
+    //    .WithBindMount("./SqlServerConfig", target: "/usr/config")                          // NOTE: ensure all script are UTF-8 with LF line endings for Linux container
     //.WithBindMount("../Aspired.Database/sql", target: "/docker-entrypoint-initdb.d")    // NOTE: ensure all script are UTF-8 with LF line endings for Linux container
-//    .WithBindMount("./Database", target: "/docker-entrypoint-initdb.d")                 // NOTE: ensure all script are UTF-8 with LF line endings for Linux container
-//    .WithEntrypoint("/usr/config/entrypoint.sh");
-    ;
+    //    .WithBindMount("./Database", target: "/docker-entrypoint-initdb.d")                 // NOTE: ensure all script are UTF-8 with LF line endings for Linux container
+    //    .WithEntrypoint("/usr/config/entrypoint.sh");
+    // .WithResetDatabaseCommand()
+    .WithEndpointProxySupport(false);
+#pragma warning restore ASPIREPROXYENDPOINTS001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+;
     //.PublishAsConnectionString()  // if you want to just publish this as a connection string
     //.PublishAsAzureSqlDatabase()  // todo: come back to this
 
