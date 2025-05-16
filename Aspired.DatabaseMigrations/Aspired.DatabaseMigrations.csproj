@@ -8,23 +8,27 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Microsoft.Data.SqlClient" Version="9.1.0" />
+    <PackageReference Include="Aspire.Microsoft.Data.SqlClient" Version="9.2.1" />
     <PackageReference Include="dbup-sqlserver" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.5" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!--<ItemGroup>
     <None Include="Scripts/*.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>-->
+
+  <ItemGroup>
+    <EmbeddedResource Include="scripts/**/*.sql" />
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+  <!--<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="echo OS: $(OS)"></Exec>
     <Exec Command="echo OutDir: $(OutDir)"></Exec>
     <Exec Condition="'$(OS)' == 'Windows_NT'" Command="rmdir /s /q &quot;$(OutDir)\\Scripts&quot; &amp;&amp; mkdir &quot;$(OutDir)\\Scripts&quot;" />
-    <!--<Exec Condition="'$(OS)' == 'Windows_NT'" Command="mkdir &quot;$(OutDir)\\Scripts\\Test&quot;" />-->
+    --><!--<Exec Condition="'$(OS)' == 'Windows_NT'" Command="mkdir &quot;$(OutDir)\\Scripts\\Test&quot;" />--><!--
     <Exec Condition="'$(OS)' != 'Windows_NT'" Command="rm -rf &quot;$(OutputPath)&quot; &amp;&amp; mkdir -p &quot;$(OutputPath)&quot;" />
-  </Target>
+  </Target>-->
     
 </Project>

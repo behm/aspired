@@ -1,4 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using System.Reflection;
+
 using DbUp;
 
 using Microsoft.Extensions.Configuration;
@@ -31,7 +33,8 @@ EnsureDatabase.For.SqlDatabase(connectionString);
 var upgradeEngine = DeployChanges.To
     .SqlDatabase(connectionString)
     .LogToConsole() // todo: figure out better logging solution (i.e. ILogger???)
-    .WithScriptsFromFileSystem("Scripts")
+    //.WithScriptsFromFileSystem("Scripts")
+    .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
     .Build();
 
 var result = upgradeEngine.PerformUpgrade();

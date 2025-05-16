@@ -1,5 +1,7 @@
 using Aspired.AppHost.Commands;
 
+using Microsoft.Extensions.Hosting;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var cache = builder.AddRedis("cache");
@@ -15,7 +17,7 @@ var cache = builder.AddRedis("cache");
 //    .PublishTo(sqlContainer);
 
 
-var sqlPassword = builder.AddParameter("sql-password");
+var sqlPassword = builder.AddParameter("sql-password", "P@ssw0rd12345");    // password can be overridden in user secrets or environment variables
 
 #pragma warning disable ASPIREPROXYENDPOINTS001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 var sqlServer = builder
@@ -23,18 +25,22 @@ var sqlServer = builder
     .WithDataVolume("aspired-data")
     .WithContainerName("aspired-sql")
     .WithLifetime(ContainerLifetime.Persistent)
+    .WithEndpointProxySupport(false);
     //    .WithBindMount("./SqlServerConfig", target: "/usr/config")                          // NOTE: ensure all script are UTF-8 with LF line endings for Linux container
     //.WithBindMount("../Aspired.Database/sql", target: "/docker-entrypoint-initdb.d")    // NOTE: ensure all script are UTF-8 with LF line endings for Linux container
     //    .WithBindMount("./Database", target: "/docker-entrypoint-initdb.d")                 // NOTE: ensure all script are UTF-8 with LF line endings for Linux container
     //    .WithEntrypoint("/usr/config/entrypoint.sh");
-    // .WithResetDatabaseCommand()
-    .WithEndpointProxySupport(false);
-#pragma warning restore ASPIREPROXYENDPOINTS001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-;
+
     //.PublishAsConnectionString()  // if you want to just publish this as a connection string
     //.PublishAsAzureSqlDatabase()  // todo: come back to this
+#pragma warning restore ASPIREPROXYENDPOINTS001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
 var sqlDatabase = sqlServer.AddDatabase("aspired-db", "Aspired");
+if (builder.Environment.IsDevelopment())
+{ 
+    sqlDatabase.
+        WithResetDatabaseCommand();
+}
 
 var dbMigrator = builder.AddProject<Projects.Aspired_DatabaseMigrations>("db-migrator")
     .WithReference(sqlDatabase)

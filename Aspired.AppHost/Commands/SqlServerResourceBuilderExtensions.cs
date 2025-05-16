@@ -1,60 +1,56 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Data.SqlClient;
 
 namespace Aspired.AppHost.Commands
 {
     public static class SqlServerResourceBuilderExtensions
     {
-        public static IResourceBuilder<SqlServerServerResource> WithResetDatabaseCommand(this IResourceBuilder<SqlServerServerResource> builder)
+        public static IResourceBuilder<SqlServerDatabaseResource> WithResetDatabaseCommand(this IResourceBuilder<SqlServerDatabaseResource> builder)
         {
             builder.WithCommand(
-                name: "reset-database",
-                displayName: "Reset Database",
-                executeCommand: context => OnRunResetDatabase(builder, context),
-                updateState: OnUpdateResourceState,
-                iconName: "AnimalRabbitOff",
-                iconVariant: IconVariant.Filled
-            );
+                name: "reset-database", 
+                displayName: "Reset Database (DROP & RE-CREATE)",
+                executeCommand: async (ExecuteCommandContext context) =>
+                {
+                    var connectionString = await builder.Resource.ConnectionStringExpression.GetValueAsync(context.CancellationToken);
+                    var masterConnectionString = new SqlConnectionStringBuilder(connectionString)
+                    {
+                        InitialCatalog = "master"
+                    }.ConnectionString;
+                    using var connection = new SqlConnection(masterConnectionString);
+                    await connection.OpenAsync(context.CancellationToken);
+
+                    // DROP & recreate the database
+                    using var cmd = connection.CreateCommand();
+                    cmd.CommandText = $@"
+                        ALTER DATABASE [{builder.Resource.DatabaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+                        IF DB_ID(N'{builder.Resource.DatabaseName}') IS NOT NULL
+                        BEGIN
+                            DROP DATABASE [{builder.Resource.DatabaseName}];
+                        END
+                    ";
+                        //CREATE DATABASE [{builder.Resource.DatabaseName}];
+                    await cmd.ExecuteNonQueryAsync(context.CancellationToken);
+
+                    // Command execution logic here
+                    await Task.CompletedTask;
+                    return CommandResults.Success();
+                },
+                commandOptions: new CommandOptions
+                {
+                    UpdateState = (UpdateCommandStateContext context) =>
+                    {
+                        // State update logic here
+                        return ResourceCommandState.Enabled;
+                    },
+                    Description = "DROPs the database and recreates it so that migrations can be re-run",
+                    Parameter = new[] { "", "" },
+                    ConfirmationMessage = "Are you sure?  This will DELETE all data!",
+                    IconName = "ArrowReset",
+                    IconVariant = IconVariant.Filled,
+                    IsHighlighted = false
+                });
 
             return builder;
-        }
-
-        public static async Task<ExecuteCommandResult> OnRunResetDatabase(
-            IResourceBuilder<SqlServerServerResource> builder, 
-            ExecuteCommandContext context)
-        {
-            //var connectionString = builder.
-
-            //var resource = context.Resource;
-            //var connection = resource.GetConnection();
-            //// NOTE: This is a simple example of how to reset a database
-            ////       You should be careful with this command as it will delete all data in the database
-            ////       and recreate the schema
-            //await connection.ResetDatabaseAsync();
-            
-            await Task.Delay(1000);
-
-            return CommandResults.Success();
-        }
-
-        private static ResourceCommandState OnUpdateResourceState(UpdateCommandStateContext context)
-        {
-            var logger = context.ServiceProvider.GetRequiredService<ILogger<Program>>();
-            if (logger.IsEnabled(LogLevel.Information))
-            {
-                logger.LogInformation("Updating resource state: {ResourceSnapshot}", context.ResourceSnapshot);
-            }
-
-            return context.ResourceSnapshot.HealthStatus is HealthStatus.Healthy
-                ? ResourceCommandState.Enabled
-                : ResourceCommandState.Disabled;
         }
     }
 }
