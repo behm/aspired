@@ -1,7 +1,7 @@
-﻿CREATE TABLE [dbo].[Product]
+﻿CREATE TABLE [dbo].[Products]
 (
 	[ProductId] INT NOT NULL PRIMARY KEY IDENTITY, 
     [Name] VARCHAR(50) NOT NULL, 
-    [Description] VARCHAR(250) NOT NULL, 
+    [Description] VARCHAR(250) NOT NULL,
     [CreatedAt] DATETIME NOT NULL DEFAULT GETDATE() 
 )

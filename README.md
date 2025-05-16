@@ -14,7 +14,7 @@ Add the following packages to the AppHost project
 
 You will need to create a Parameter entry in the secrets.json file to provide the SQL Password used for creating the SQL Server container.
 
-`dotnet user-secrets set "Parameres:SqlPassword" "YourPassword"`
+`dotnet user-secrets set "Parameters:sql-password" "YourPassword"`
 
 The SQL Server port is hard-coded to `7890` but you could create another parameter and add the corresponding secrets value.
 

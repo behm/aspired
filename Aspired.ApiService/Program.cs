@@ -1,3 +1,7 @@
+using Aspired.ApiService.Data;
+
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire components.
@@ -5,6 +9,13 @@ builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
+
+builder.AddSqlServerClient("aspired-sql");
+
+builder.Services.AddDbContext<AspiredContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("aspired-db"));
+});
 
 var app = builder.Build();
 
@@ -27,6 +38,21 @@ app.MapGet("/weatherforecast", () =>
         ))
         .ToArray();
     return forecast;
+});
+
+var products = app.MapGroup("/products");
+
+products.MapGet("/", async (AspiredContext dbContext) =>
+{
+    return await dbContext.Products
+        .Where(x => x.IsEnabled)
+        .ToListAsync();
+});
+
+products.MapGet("/all", async (AspiredContext dbContext) =>
+{
+    return await dbContext.Products
+        .ToListAsync();
 });
 
 app.MapDefaultEndpoints();

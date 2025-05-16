@@ -4,6 +4,9 @@ root = true
 [*]
 indent_style = space
 
+[*.csproj]
+indent_size = 2
+
 # Xml files
 [*.xml]
 indent_size = 2

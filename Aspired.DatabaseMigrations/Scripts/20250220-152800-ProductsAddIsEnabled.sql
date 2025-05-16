@@ -1,0 +1,1 @@
+﻿ALTER TABLE [dbo].[Products] ADD [IsEnabled] BIT NOT NULL DEFAULT 1;
