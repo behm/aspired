@@ -1,3 +1,5 @@
+using Aspire.Hosting.Publishing;
+
 using Aspired.AppHost.Commands;
 
 using Microsoft.Extensions.Hosting;
@@ -17,7 +19,7 @@ var cache = builder.AddRedis("cache");
 //    .PublishTo(sqlContainer);
 
 
-var sqlPassword = builder.AddParameter("sql-password", "P@ssw0rd12345");    // password can be overridden in user secrets or environment variables
+var sqlPassword = builder.AddParameter("sql-password", new SqlPasswordDefault());    // password can be overridden in user secrets or environment variables
 
 #pragma warning disable ASPIREPROXYENDPOINTS001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 var sqlServer = builder
@@ -81,4 +83,14 @@ builder.AddProject<Projects.Aspired_Web>("webfrontend")
 builder.Build().Run();
 
 
-// connection string: Data Source-127.0.0.1,1234; Initial Catalog=aspired-db;
+internal class SqlPasswordDefault : ParameterDefault
+{
+    public override string GetDefaultValue()
+    {
+        return "P@ssw0rd12345";
+    }
+
+    public override void WriteToManifest(ManifestPublishingContext context)
+    {
+    }
+}
